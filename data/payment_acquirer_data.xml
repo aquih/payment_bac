@@ -10,7 +10,7 @@
             <field name="view_template_id" ref="bac_acquirer_button"/>
             <field name="environment">test</field>
             <field name="pre_msg"><![CDATA[
-<p>Será redireccionado al sitio de Credomatic para que ingrese sus datos luego de apachar el botón de "Pagar".</p>]]></field>
+<p>Será redireccionado al sitio de Credomatic para que ingrese sus datos luego de apachar el botón de "Pagar ahora".</p>]]></field>
             <field name="bac_key_id">dummy</field>
         </record>
 

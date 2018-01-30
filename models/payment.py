@@ -19,7 +19,6 @@ class AcquirerBAC(models.Model):
 
     @api.multi
     def bac_form_generate_values(self, values):
-        _logger.warn(values)
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         bac_tx_values = dict(values)
         bac_tx_values.update({
@@ -34,20 +33,17 @@ class AcquirerBAC(models.Model):
     def bac_get_form_action_url(self):
         return "https://credomatic.compassmerchantsolutions.com/cart/cart.php"
 
-
 class TxBAC(models.Model):
     _inherit = 'payment.transaction'
-
 
     @api.model
     def _bac_form_get_tx_from_data(self, data):
         """ Given a data dict coming from bac, verify it and find the related
         transaction record. """
         origin_data = dict(data)
-        data = normalize_keys_upper(data)
-        reference, pay_id, shasign = data.get('BRQ_INVOICENUMBER'), data.get('BRQ_PAYMENT'), data.get('BRQ_SIGNATURE')
-        if not reference or not pay_id or not shasign:
-            error_msg = _('BAC: received data with missing reference (%s) or pay_id (%s) or shasign (%s)') % (reference, pay_id, shasign)
+        reference = data.get('order_description')
+        if not reference:
+            error_msg = _('BAC: received data with missing reference (%s)') % (reference)
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
@@ -61,47 +57,22 @@ class TxBAC(models.Model):
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
-        # verify shasign
-        shasign_check = tx.acquirer_id._bac_generate_digital_sign('out', origin_data)
-        if shasign_check.upper() != shasign.upper():
-            error_msg = _('BAC: invalid shasign, received %s, computed %s, for data %s') % (shasign, shasign_check, data)
-            _logger.info(error_msg)
-            raise ValidationError(error_msg)
-
         return tx
 
     def _bac_form_get_invalid_parameters(self, data):
         invalid_parameters = []
-        data = normalize_keys_upper(data)
-        if self.acquirer_reference and data.get('BRQ_TRANSACTIONS') != self.acquirer_reference:
-            invalid_parameters.append(('Transaction Id', data.get('BRQ_TRANSACTIONS'), self.acquirer_reference))
         # check what is buyed
-        if float_compare(float(data.get('BRQ_AMOUNT', '0.0')), self.amount, 2) != 0:
-            invalid_parameters.append(('Amount', data.get('BRQ_AMOUNT'), '%.2f' % self.amount))
-        if data.get('BRQ_CURRENCY') != self.currency_id.name:
-            invalid_parameters.append(('Currency', data.get('BRQ_CURRENCY'), self.currency_id.name))
+        if float_compare(float(data.get('amount', '0.0')), self.amount, 2) != 0:
+            invalid_parameters.append(('Amount', data.get('amount'), '%.2f' % self.amount))
 
         return invalid_parameters
 
     def _bac_form_validate(self, data):
-        data = normalize_keys_upper(data)
-        status_code = int(data.get('BRQ_STATUSCODE', '0'))
-        if status_code in self._bac_valid_tx_status:
+        status_code = data.get('responsetext', '--')
+        if status_code == 'SUCCESS':
             self.write({
                 'state': 'done',
-                'acquirer_reference': data.get('BRQ_TRANSACTIONS'),
-            })
-            return True
-        elif status_code in self._bac_pending_tx_status:
-            self.write({
-                'state': 'pending',
-                'acquirer_reference': data.get('BRQ_TRANSACTIONS'),
-            })
-            return True
-        elif status_code in self._bac_cancel_tx_status:
-            self.write({
-                'state': 'cancel',
-                'acquirer_reference': data.get('BRQ_TRANSACTIONS'),
+                'acquirer_reference': data.get('transactionid'),
             })
             return True
         else:
@@ -110,6 +81,6 @@ class TxBAC(models.Model):
             self.write({
                 'state': 'error',
                 'state_message': error,
-                'acquirer_reference': data.get('BRQ_TRANSACTIONS'),
+                'acquirer_reference': data.get('transactionid'),
             })
             return False

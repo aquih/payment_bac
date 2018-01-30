@@ -7,10 +7,10 @@
                 <input type="hidden" name="action" value="process_fixed" />
                 <input type="hidden" name="key_id" t-att-value="bac_key_id"/>
                 <input type="hidden" name="amount" t-att-value="bac_amount"/>
-                <input type="hidden" name="language" value="es" />
                 <input type="hidden" name="url_finish" t-att-value="bac_return" />
-                <input type="hidden" name="customer_receipt" value="true" />
                 <input type="hidden" name="order_description" t-att-value="bac_reference"/>
+                <input type="hidden" name="customer_receipt" value="true" />
+                <input type="hidden" name="language" value="es" />
                 <button type="submit" width="100px"
                     t-att-class="submit_class">
                     <img t-if="not submit_txt" src="/payment_bac/static/src/img/bac_icon.png"/>
