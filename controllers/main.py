@@ -20,6 +20,5 @@ class BACController(http.Controller):
         """ BAC """
         _logger.info('BAC: entering form_feedback with post data %s', pprint.pformat(post))  # debug
         request.env['payment.transaction'].sudo().form_feedback(post, 'bac')
-        post = dict((key.upper(), value) for key, value in post.items())
-        return_url = post.get('ADD_RETURNDATA') or '/'
-        return werkzeug.utils.redirect(return_url)
+        _logger.warn(post)
+        return werkzeug.utils.redirect(post.pop('return_url', '/'))

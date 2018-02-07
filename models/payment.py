@@ -73,6 +73,7 @@ class TxBAC(models.Model):
             self.write({
                 'state': 'done',
                 'acquirer_reference': data.get('transactionid'),
+                'date_validate': fields.datetime.now(),
             })
             return True
         else:
