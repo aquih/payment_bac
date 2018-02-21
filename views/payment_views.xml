@@ -10,6 +10,7 @@
                 <xpath expr='//group[@name="acquirer"]' position='after'>
                     <group attrs="{'invisible': [('provider', '!=', 'bac')]}">
                         <field name="bac_key_id"/>
+                        <field name="bac_key_text"/>
                     </group>
                 </xpath>
             </field>

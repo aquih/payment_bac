@@ -3,6 +3,8 @@ from hashlib import sha1
 import logging
 import urllib
 import urlparse
+import random
+import hashlib
 
 from odoo import api, fields, models, _
 from odoo.addons.payment.models.payment_acquirer import ValidationError
@@ -16,17 +18,25 @@ class AcquirerBAC(models.Model):
 
     provider = fields.Selection(selection_add=[('bac', 'BAC')])
     bac_key_id = fields.Char('Key ID', required_if_provider='bac', groups='base.group_user')
+    bac_key_text = fields.Char('Key Text', required_if_provider='bac', groups='base.group_user')
 
     @api.multi
     def bac_form_generate_values(self, values):
+        # reference = values['reference']+'--{:04d}'.format(random.randint(1, 100))
+        reference = values['reference']
+        _logger.warn('process_fixed|'+str(values['amount'])+'|'+reference+'|'+self.bac_key_text)
+        m = hashlib.md5('process_fixed|'+str(values['amount'])+'|'+reference+'|'+self.bac_key_text)
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         bac_tx_values = dict(values)
         bac_tx_values.update({
             'bac_key_id': self.bac_key_id,
+            'bac_key_text': self.bac_key_text,
             'bac_amount': values['amount'],
-            'bac_reference': values['reference'],
+            'bac_reference': reference,
             'bac_return': '%s' % urlparse.urljoin(base_url, BACController._return_url),
+            'bac_hash': 'action|amount|order_description|'+m.hexdigest(),
         })
+        logging.warn(bac_tx_values)
         return bac_tx_values
 
     @api.multi
@@ -47,9 +57,11 @@ class TxBAC(models.Model):
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
-        tx = self.search([('reference', '=', reference)])
+        # order = reference.split('--')[0]
+        order = reference
+        tx = self.search([('reference', '=', order)])
         if not tx or len(tx) > 1:
-            error_msg = _('BAC: received data for reference %s') % (reference)
+            error_msg = _('BAC: received data for reference %s') % (order)
             if not tx:
                 error_msg += _('; no order found')
             else:
