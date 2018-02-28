@@ -24,7 +24,6 @@ class AcquirerBAC(models.Model):
     def bac_form_generate_values(self, values):
         # reference = values['reference']+'--{:04d}'.format(random.randint(1, 100))
         reference = values['reference']
-        _logger.warn('process_fixed|'+str(values['amount'])+'|'+reference+'|'+self.bac_key_text)
         m = hashlib.md5('process_fixed|'+str(values['amount'])+'|'+reference+'|'+self.bac_key_text)
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         bac_tx_values = dict(values)
