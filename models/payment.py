@@ -79,8 +79,8 @@ class TxBAC(models.Model):
         return invalid_parameters
 
     def _bac_form_validate(self, data):
-        status_code = data.get('responsetext', '--')
-        if status_code == 'SUCCESS':
+        status_code = data.get('response', '3')
+        if status_code == '1':
             self.write({
                 'state': 'done',
                 'acquirer_reference': data.get('transactionid'),
