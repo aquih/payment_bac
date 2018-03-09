@@ -14,6 +14,7 @@
                 <input type="hidden" name="hash" t-att-value="bac_hash"/>
                 <input type="hidden" name="first_name" t-att-value="partner_first_name"/>
                 <input type="hidden" name="last_name" t-att-value="partner_last_name"/>
+                <input type="hidden" name="email" t-att-value="partner_email"/>
                 <input type="hidden" name="address_1" t-att-value="partner_address"/>
                 <input type="hidden" name="postal_code" t-att-value="partner_zip"/>
                 <input type="hidden" name="city" t-att-value="partner_city"/>
