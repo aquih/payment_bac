@@ -29,18 +29,20 @@ class AcquirerBAC(osv.Model):
     def bac_form_generate_values(self, cr, uid, id, partner_values, values, context=None):
         # reference = values['reference']+'--{:04d}'.format(random.randint(1, 100))
         reference = values['reference']
-        m = hashlib.md5('process_fixed|'+str(values['amount'])+'|'+reference+'|'+self.bac_key_text)
+        acquirer = self.browse(cr, uid, id, context=context)
+        m = hashlib.md5('process_fixed|'+str(values['amount'])+'|'+reference+'|'+acquirer.bac_key_text)
         base_url = self.pool['ir.config_parameter'].get_param(cr, uid, 'web.base.url')
         bac_tx_values = dict(values)
         bac_tx_values.update({
-            'bac_key_id': self.bac_key_id,
-            'bac_key_text': self.bac_key_text,
+            'bac_key_id': acquirer.bac_key_id,
+            'bac_key_text': acquirer.bac_key_text,
             'bac_amount': values['amount'],
             'bac_reference': reference,
             'bac_return': '%s' % urlparse.urljoin(base_url, BACController._return_url),
             'bac_hash': 'action|amount|order_description|'+m.hexdigest(),
         })
         logging.warn(bac_tx_values)
+        logging.warn(partner_values)
         return partner_values, bac_tx_values
 
     def bac_get_form_action_url(self, cr, uid, id, context=None):
