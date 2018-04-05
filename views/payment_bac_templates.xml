@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<openerp>
     <data noupdate="1">
 
         <template id="bac_acquirer_button">
             <form t-if="acquirer.bac_key_id" t-att-action="tx_url" method="post" target="_self">
                 <input type="hidden" name="action" value="process_fixed" />
-                <input type="hidden" name="key_id" t-att-value="bac_key_id"/>
-                <input type="hidden" name="amount" t-att-value="bac_amount"/>
-                <input type="hidden" name="url_finish" t-att-value="bac_return"/>
-                <input type="hidden" name="order_description" t-att-value="bac_reference"/>
+                <input type="hidden" name="key_id" t-att-value="tx_values['bac_key_id']"/>
+                <input type="hidden" name="amount" t-att-value="tx_values['bac_amount']"/>
+                <input type="hidden" name="url_finish" t-att-value="tx_values['bac_return']"/>
+                <input type="hidden" name="order_description" t-att-value="tx_values['bac_reference']"/>
                 <input type="hidden" name="customer_receipt" value="true" />
                 <input type="hidden" name="language" value="es" />
-                <input type="hidden" name="hash" t-att-value="bac_hash"/>
-                <input type="hidden" name="first_name" t-att-value="partner_first_name"/>
-                <input type="hidden" name="last_name" t-att-value="partner_last_name"/>
-                <input type="hidden" name="email" t-att-value="partner_email"/>
-                <input type="hidden" name="address_1" t-att-value="partner_address"/>
-                <input type="hidden" name="postal_code" t-att-value="partner_zip"/>
-                <input type="hidden" name="city" t-att-value="partner_city"/>
-                <input type="hidden" name="shipping_state" t-att-value="partner_state.code"/>
-                <input type="hidden" name="country" t-att-value="partner_country.code"/>
-                <input type="hidden" name="phone" t-att-value="partner_phone"/>
+                <input type="hidden" name="hash" t-att-value="tx_values['bac_hash']"/>
+                <input type="hidden" name="first_name" t-att-value="tx_values['partner_first_name']"/>
+                <input type="hidden" name="last_name" t-att-value="tx_values['partner_last_name']"/>
+                <input type="hidden" name="email" t-att-value="tx_values['partner_email']"/>
+                <input type="hidden" name="address_1" t-att-value="tx_values['partner_address']"/>
+                <input type="hidden" name="postal_code" t-att-value="tx_values['partner_zip']"/>
+                <input type="hidden" name="city" t-att-value="tx_values['partner_city']"/>
+                <input type="hidden" name="shipping_state" t-att-value="tx_values['partner_state.code']"/>
+                <input type="hidden" name="country" t-att-value="tx_values['partner_country.code']"/>
+                <input type="hidden" name="phone" t-att-value="tx_values['partner_phone']"/>
                 <t t-if="return_url">
-                    <input type='hidden' name='return_url' t-att-value='return_url'/>
+                    <input type='hidden' name='return_url' t-att-value="tx_values['return_url']"/>
                 </t>
                 <button type="submit" width="100px"
                     t-att-class="submit_class">
@@ -33,4 +33,4 @@
         </template>
 
     </data>
-</odoo>
+</openerp>
