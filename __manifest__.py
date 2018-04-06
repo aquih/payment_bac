@@ -6,6 +6,7 @@
     'summary': 'Payment Acquirer: BAC Implementation',
     'version': '1.0',
     'description': """BAC Payment Acquirer""",
+    'author': 'aquíH',
     'depends': ['payment'],
     'data': [
         'views/payment_views.xml',
