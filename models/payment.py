@@ -30,7 +30,7 @@ class AcquirerBAC(osv.Model):
         # reference = values['reference']+'--{:04d}'.format(random.randint(1, 100))
         reference = values['reference']
         acquirer = self.browse(cr, uid, id, context=context)
-        m = hashlib.md5('process_fixed|'+str(values['amount'])+'|'+reference+'|'+acquirer.bac_key_text)
+        m = hashlib.md5('process_fixed|'+str(values['amount'])+'|'+str(reference)+'|'+str(acquirer.bac_key_text))
         base_url = self.pool['ir.config_parameter'].get_param(cr, uid, 'web.base.url')
         bac_tx_values = dict(values)
         bac_tx_values.update({
@@ -82,9 +82,8 @@ class TxBAC(osv.Model):
 
     def _bac_form_get_invalid_parameters(self, cr, uid, tx, data, context=None):
         invalid_parameters = []
-        # check what is buyed
-        if float_compare(float(data.get('amount', '0.0')), self.amount, 2) != 0:
-            invalid_parameters.append(('Amount', data.get('amount'), '%.2f' % self.amount))
+        if float_compare(float(data.get('amount', '0.0')), tx.amount, 2) != 0:
+            invalid_parameters.append(('Amount', data.get('amount'), '%.2f' % tx.amount))
 
         return invalid_parameters
 
