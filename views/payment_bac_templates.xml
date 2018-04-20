@@ -21,7 +21,7 @@
                 <input type="hidden" name="shipping_state" t-att-value="partner_values['state'].code"/>
                 <input type="hidden" name="country" t-att-value="partner_values['country'].code"/>
                 <input type="hidden" name="phone" t-att-value="partner_values['phone']"/>
-                <t t-if="return_url">
+                <t t-if="tx_values.get('return_url')">
                     <input type='hidden' name='return_url' t-att-value="tx_values['return_url']"/>
                 </t>
                 <button type="submit" width="100px"

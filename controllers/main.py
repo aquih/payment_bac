@@ -21,4 +21,4 @@ class BACController(http.Controller):
         _logger.info('BAC: entering form_feedback with post data %s', pprint.pformat(post))  # debug
         request.registry['payment.transaction'].form_feedback(request.cr, SUPERUSER_ID, post, 'bac', context=request.context)
         _logger.warn(post)
-        return werkzeug.utils.redirect(post.pop('return_url', '/'))
+        return werkzeug.utils.redirect(post.pop('return_url', ''))
