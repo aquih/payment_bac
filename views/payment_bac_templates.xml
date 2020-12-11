@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data>
 
-        <template id="bac_acquirer_button">
-            <form t-if="acquirer.bac_key_id" t-att-action="tx_url" method="post" target="_self">
+        <template id="bac_form">
+            <div>
+                <input type="hidden" name="data_set" t-att-data-action-url="tx_url" data-remove-me=""/>
                 <input type="hidden" name="action" value="process_fixed" />
                 <input type="hidden" name="key_id" t-att-value="bac_key_id"/>
                 <input type="hidden" name="amount" t-att-value="bac_amount"/>
@@ -24,12 +25,7 @@
                 <t t-if="return_url">
                     <input type='hidden' name='return_url' t-att-value='return_url'/>
                 </t>
-                <button type="submit" width="100px"
-                    t-att-class="submit_class">
-                    <img t-if="not submit_txt" src="/payment_bac/static/src/img/bac_icon.png"/>
-                    <span t-if="submit_txt"><t t-esc="submit_txt"/> <span class="fa fa-long-arrow-right"/></span>
-                </button>
-            </form>
+            </div>
         </template>
 
     </data>
