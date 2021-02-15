@@ -12,6 +12,7 @@ from odoo.addons.payment.models.payment_acquirer import ValidationError
 from odoo.addons.payment_bac.controllers.payment import BACController
 from odoo.tools.float_utils import float_compare
 from odoo.release import version_info
+from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class AcquirerBAC(models.Model):
     bac_key_text = fields.Char('Key Text', required_if_provider='bac', groups='base.group_user')
 
     def bac_form_generate_values(self, values):
-        reference = values['reference']
+        reference = '{}|{}'.format(values['reference'], request.session.sid)
         to_hash = 'process_fixed|'+str(values['amount'])+'|'+reference+'|'+self.bac_key_text
         m = hashlib.md5(to_hash.encode('utf-8'))
         
@@ -50,12 +51,14 @@ class TxBAC(models.Model):
     def _bac_form_get_tx_from_data(self, data):
         """ Given a data dict coming from bac, verify it and find the related
         transaction record. """
-        reference = data.get('order_description')
-        if not reference:
-            error_msg = _('BAC: received data with missing reference (%s)') % (reference)
+        complete_reference = data.get('order_description')
+        if not complete_reference:
+            error_msg = _('BAC: received data with missing reference (%s)') % (complete_reference)
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
+        reference_parts = complete_reference.split('|')
+        reference = reference_parts[0]
         tx = self.search([('reference', '=', reference)])
         
         if version_info[0] == 11:
