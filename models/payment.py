@@ -35,7 +35,7 @@ class AcquirerBAC(models.Model):
             'bac_key_text': self.bac_key_text,
             'bac_amount': values['amount'],
             'bac_reference': reference,
-            'bac_return': '%s' %  urllib.parse.urljoin(base_url, BACController._return_url),
+            'bac_return': '%s?session_id=x' %  urllib.parse.urljoin(base_url, BACController._return_url),
             'bac_hash': 'action|amount|order_description|'+m.hexdigest(),
         })
         return bac_tx_values
