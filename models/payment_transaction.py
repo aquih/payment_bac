@@ -23,25 +23,24 @@ class PaymentTransaction(models.Model):
     
     def _get_specific_rendering_values(self, processing_values):
         res = super()._get_specific_rendering_values(processing_values)
-        if self.provider != 'bac':
+        if self.provider_code != 'bac':
             return res
         
-        return_url = urls.url_join(self.acquirer_id.get_base_url(), BACController._return_url),
-        session_id = request.session.sid
-        reference = '{}|{}'.format(self.reference, request.session.sid)
+        return_url = urls.url_join(self.provider_id.get_base_url(), BACController._return_url)
+        reference = '{}'.format(self.reference)
         bac_partner_address1 = self.partner_id.street[0:35] if self.partner_id.street else ''
         bac_partner_address2 = self.partner_id.street2[0:35] if self.partner_id.street2 else ''
         
-        to_hash = 'process_fixed|'+str(processing_values['amount'])+'|'+reference+'|'+self.acquirer_id.bac_key_text
+        to_hash = 'process_fixed|'+str(processing_values['amount'])+'|'+reference+'|'+self.provider_id.bac_key_text
         m = hashlib.md5(to_hash.encode('utf-8'))
         
         rendering_values = {
-            'api_url': self.acquirer_id._bac_get_api_url(),
-            'bac_key_id': self.acquirer_id.bac_key_id,
-            'bac_key_text': self.acquirer_id.bac_key_text,
+            'api_url': self.provider_id._bac_get_api_url(),
+            'bac_key_id': self.provider_id.bac_key_id,
+            'bac_key_text': self.provider_id.bac_key_text,
             'bac_amount': processing_values['amount'],
             'bac_reference': reference,
-            'bac_return': '%s?session_id=x' %  return_url,
+            'bac_return': return_url,
             'bac_hash': 'action|amount|order_description|'+m.hexdigest(),
             'bac_partner_first_name': self.partner_id.name,
             'bac_partner_last_name': '',
@@ -57,20 +56,18 @@ class PaymentTransaction(models.Model):
         return rendering_values
 
     @api.model
-    def _get_tx_from_feedback_data(self, provider, data):
-        tx = super()._get_tx_from_feedback_data(provider, data)
-        if provider != 'bac':
+    def _get_tx_from_notification_data(self, provider_code, notification_data):
+        tx = super()._get_tx_from_notification_data(provider_code, notification_data)
+        if provider_code != 'bac':
             return tx
         
-        complete_reference = data.get('order_description', '')
-        reference_parts = complete_reference.split('|')
-        reference = reference_parts[0]
+        reference = notification_data.get('order_description', '')
         if not reference:
             error_msg = _('BAC: received data with missing reference (%s)') % (reference)
             _logger.info(error_msg)
             raise ValidationError(error_msg)
 
-        tx = self.search([('reference', '=', reference), ('provider', '=', 'bac')])
+        tx = self.search([('reference', '=', reference), ('provider_code', '=', 'bac')])
         _logger.info(tx)
 
         if not tx or len(tx) > 1:
@@ -84,20 +81,18 @@ class PaymentTransaction(models.Model):
 
         return tx
 
-    def _process_feedback_data(self, data):
-        super()._process_feedback_data(data)
-        if self.provider != 'bac':
+    def _process_notification_data(self, notification_data):
+        super()._process_notification_data(notification_data)
+        if self.provider_code != 'bac':
             return
         
-        complete_reference = data.get('order_description', '')
-        reference_parts = complete_reference.split('|')
-        reference = reference_parts[0]
+        reference = notification_data.get('order_description', '')
         
-        self.acquirer_reference = reference
-        status_code = data.get('response', '3')
+        self.provider_reference = reference
+        status_code = notification_data.get('response', '3')
         if status_code == '1':
             self._set_done()
         else:
-            error = 'BAC: error '+data.get('message')
+            error = 'BAC: error '+notification_data.get('message')
             _logger.info(error)
             self._set_error(_("Your payment was refused (code %s). Please try again.", status_code))
