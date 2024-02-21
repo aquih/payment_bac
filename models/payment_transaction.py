@@ -27,8 +27,7 @@ class PaymentTransaction(models.Model):
             return res
         
         return_url = urls.url_join(self.acquirer_id.get_base_url(), BACController._return_url)
-        session_id = request.session.sid
-        reference = '{}|{}'.format(self.reference, request.session.sid)
+        reference = self.reference
         bac_partner_address1 = self.partner_id.street[0:35] if self.partner_id.street else ''
         bac_partner_address2 = self.partner_id.street2[0:35] if self.partner_id.street2 else ''
         
@@ -41,7 +40,7 @@ class PaymentTransaction(models.Model):
             'bac_key_text': self.acquirer_id.bac_key_text,
             'bac_amount': processing_values['amount'],
             'bac_reference': reference,
-            'bac_return': '%s?session_id=x' %  return_url,
+            'bac_return': return_url,
             'bac_hash': 'action|amount|order_description|'+m.hexdigest(),
             'bac_partner_first_name': self.partner_id.name,
             'bac_partner_last_name': '',
@@ -62,9 +61,7 @@ class PaymentTransaction(models.Model):
         if provider != 'bac':
             return tx
         
-        complete_reference = data.get('order_description', '')
-        reference_parts = complete_reference.split('|')
-        reference = reference_parts[0]
+        reference = data.get('order_description', '')
         if not reference:
             error_msg = _('BAC: received data with missing reference (%s)') % (reference)
             _logger.info(error_msg)
@@ -89,9 +86,7 @@ class PaymentTransaction(models.Model):
         if self.provider != 'bac':
             return
         
-        complete_reference = data.get('order_description', '')
-        reference_parts = complete_reference.split('|')
-        reference = reference_parts[0]
+        reference = data.get('order_description', '')
         
         self.acquirer_reference = reference
         status_code = data.get('response', '3')
