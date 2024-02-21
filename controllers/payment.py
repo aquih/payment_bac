@@ -19,8 +19,9 @@ class BACController(http.Controller):
 
         :param dict data: The feedback data
         """
-        _logger.info('BAC: entering _get_tx_from_notification_data with post data %s', pprint.pformat(data))  # debug
-        tx_sudo = request.env['payment.transaction'].sudo()._get_tx_from_notification_data('bac', data)
-        tx_sudo._handle_notification_data('bac', data)
+        if data:
+            _logger.info('BAC: entering _get_tx_from_notification_data with post data %s', pprint.pformat(data))  # debug
+            tx_sudo = request.env['payment.transaction'].sudo()._get_tx_from_notification_data('bac', data)
+            tx_sudo._handle_notification_data('bac', data)
         
         return request.redirect('/payment/status')

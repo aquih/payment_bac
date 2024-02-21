@@ -27,7 +27,7 @@ class PaymentTransaction(models.Model):
             return res
         
         return_url = urls.url_join(self.provider_id.get_base_url(), BACController._return_url)
-        reference = '{}'.format(self.reference)
+        reference = self.reference
         bac_partner_address1 = self.partner_id.street[0:35] if self.partner_id.street else ''
         bac_partner_address2 = self.partner_id.street2[0:35] if self.partner_id.street2 else ''
         
