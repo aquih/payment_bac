@@ -11,19 +11,15 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.payment_bac.controllers.payment import BACController
-from odoo.tools.float_utils import float_compare
-from odoo.http import request
 
 _logger = logging.getLogger(__name__)
-
-signed_field_names = ['access_key', 'profile_id', 'transaction_uuid', 'signed_field_names', 'unsigned_field_names', 'signed_date_time', 'locale', 'transaction_type', 'reference_number', 'amount', 'currency', 'ship_to_address_city']
 
 class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
     
     def _get_specific_rendering_values(self, processing_values):
         res = super()._get_specific_rendering_values(processing_values)
-        if self.provider_code != 'bac':
+        if processing_values['provider_code'] != 'bac':
             return res
         
         return_url = urls.url_join(self.provider_id.get_base_url(), BACController._return_url)
@@ -70,6 +66,11 @@ class PaymentTransaction(models.Model):
         tx = self.search([('reference', '=', reference), ('provider_code', '=', 'bac')])
         _logger.info(tx)
 
+        payment_method = self.env['payment.method']._get_from_code(
+            'bac'
+        )
+        self.payment_method_id = payment_method or self.payment_method_id
+
         if not tx or len(tx) > 1:
             error_msg = _('BAC: received data for reference %s') % (reference)
             if not tx:
@@ -86,9 +87,8 @@ class PaymentTransaction(models.Model):
         if self.provider_code != 'bac':
             return
         
-        reference = notification_data.get('order_description', '')
+        self.provider_reference = notification_data.get('order_description', '')
         
-        self.provider_reference = reference
         status_code = notification_data.get('response', '3')
         if status_code == '1':
             self._set_done()

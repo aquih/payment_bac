@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="payment.payment_provider_form"/>
         <field name="arch" type="xml">
             <group name="provider_credentials" position='inside'>
-                <group attrs="{'invisible': [('code', '!=', 'bac')]}">
+                <group invisible="code != 'bac'">
                     <field name="bac_key_id"/>
                     <field name="bac_key_text"/>
                 </group>

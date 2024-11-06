@@ -4,7 +4,7 @@
     'name': 'BAC Payment Acquirer',
     'category': 'Accounting/Payment',
     'summary': 'Payment Acquirer: BAC Implementation',
-    'version': '3.0',
+    'version': '3.1',
     'description': """BAC Payment Acquirer""",
     'author': 'aquíH',
     'website': 'http://aquih.com/',
@@ -12,6 +12,7 @@
     'data': [
         'views/payment_views.xml',
         'views/payment_bac_templates.xml',
+        'data/payment_method_data.xml'
         'data/payment_provider_data.xml',
     ],
     'images': ['static/description/icon.png'],
