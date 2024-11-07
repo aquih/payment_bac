@@ -10,9 +10,9 @@
     'website': 'http://aquih.com/',
     'depends': ['payment'],
     'data': [
-        'views/payment_views.xml',
+        'views/payment_provider_views.xml',
         'views/payment_bac_templates.xml',
-        'data/payment_method_data.xml'
+        'data/payment_method_data.xml',
         'data/payment_provider_data.xml',
     ],
     'images': ['static/description/icon.png'],
