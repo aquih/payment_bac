@@ -4,7 +4,7 @@
     'name': 'BAC Payment Acquirer',
     'category': 'Accounting/Payment',
     'summary': 'Payment Acquirer: BAC Implementation',
-    'version': '3.1',
+    'version': '4.1',
     'description': """BAC Payment Acquirer""",
     'author': 'aquíH',
     'website': 'http://aquih.com/',
