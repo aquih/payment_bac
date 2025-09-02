@@ -47,7 +47,7 @@ class PaymentTransaction(models.Model):
             'bac_partner_email': self.partner_id.email,
             'bac_partner_postal_code': self.partner_id.zip,
             'bac_partner_city': self.partner_id.city,
-            'bac_partner_state': self.partner_id.state_id.code,
+            'bac_partner_state': self.partner_id.state_id.name,
             'bac_partner_country': self.partner_id.country_id.code,
             'bac_partner_phone': self.partner_id.phone,
             'bac_partner_address1': bac_partner_address1,
