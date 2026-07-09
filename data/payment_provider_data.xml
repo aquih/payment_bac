@@ -9,7 +9,7 @@
         <field name="module_id" ref="base.module_payment_bac"/>
         <field name="payment_method_ids"
                eval="[(6, 0, [
-                   ref('payment_bac.payment_method_bac'),
+                   ref('payment.payment_method_card'),
                ])]"/>
         <field name="code">bac</field>
         <field name="redirect_form_view_id" ref="redirect_form"/>
