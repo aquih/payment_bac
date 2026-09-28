@@ -19,3 +19,18 @@ class AcquirerBac(models.Model):
             return "https://credomatic.compassmerchantsolutions.com/cart/cart.php"
         else:
             return "https://credomatic.compassmerchantsolutions.com/cart/cart.php"
+
+    def _get_supported_currencies(self):
+        self.ensure_one()
+        if self.code == 'bac':
+           return super()._get_supported_currencies().filtered(
+                lambda c: c.name in const.SUPPORTED_CURRENCIES
+            )
+        return super()._get_supported_currencies()
+
+    def _get_default_payment_method_codes(self):
+        """ Override of `payment` to return the default payment method codes. """
+        self.ensure_one()
+        if self.code == 'bac':
+            return const.DEFAULT_PAYMENT_METHOD_CODES
+        return super()._get_default_payment_method_codes()
