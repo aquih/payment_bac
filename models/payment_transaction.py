@@ -8,7 +8,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 from odoo.addons.payment_bac.controllers.payment import BACController
-from odoo.addons.payment_visanet import const
+from odoo.addons.payment_bac import const
 
 _logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class PaymentTransaction(models.Model):
 
         # Update the payment payment_data.
         status_code = payment_data.get('response', '3')
-        elif status_code in const.STATUS_CODES_MAPPING['done']:
+        if status_code in const.STATUS_CODES_MAPPING['done']:
             self._set_done()
         elif status_code in const.STATUS_CODES_MAPPING['refused']:
             self._set_error("Su pago fue rechazado (code %s). Por favor intente de nuevo.", status_code)
